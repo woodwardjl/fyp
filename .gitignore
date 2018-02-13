@@ -21,3 +21,8 @@ cabal.project.local
 *.txt
 *.fyp
 *.fyp~
+*.exe
+*.sh
+*.rar
+*.zip
+test

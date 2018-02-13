@@ -11,7 +11,7 @@ data MTokenType = MKeyword | MDataKeyword | MFunction | MType | MLiteral
 data MType      = MInt 
                   deriving (Show, Eq)
 
-data Expr       = MExprAddSubtract | MExprMultDiv | | MExprUnary | MExprGrouping 
+data Expr       = MExprAddSubtract | MExprMultDiv | MExprUnary | MExprGrouping 
                   | MExprValue | MExprLiteral | MExprKeywordPrimary | MExprKeywordData
                   | MExprKeywordConditional | MExprType | MExprOperator
                   deriving (Show, Eq)

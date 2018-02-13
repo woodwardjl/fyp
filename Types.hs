@@ -1,20 +1,11 @@
 module Types where
 
-type MToken     = (MTokenType, Lexeme)
+type Token      = (TokenType, Lexeme)
 type Lexeme     = String
 
-data MTokenType = MKeyword | MDataKeyword | MFunction | MType | MLiteral
-                  | MBlockS | MBlockF | MOperator | MAssignment | MUndefined
-                  | MEmpty | MAccessor | MTerminator | MConditionalKeyword
+data TokenType  = Keyword | Type | Operator | Literal | Block | Null | Accessor | Definer | Terminator
                   deriving (Show, Eq)
 
-data MType      = MInt 
-                  deriving (Show, Eq)
+data Keyword    = ConditionalKeyword | DataKeyword | PrimaryKeyword
 
-data Expr       = MExprAddSubtract | MExprMultDiv | MExprUnary | MExprGrouping 
-                  | MExprValue | MExprLiteral | MExprKeywordPrimary | MExprKeywordData
-                  | MExprKeywordConditional | MExprType | MExprOperator
-                  deriving (Show, Eq)
 
-data Stmt       = MDefineStmt | MAssignmentStmt | MConditionalStmt | MBlockStmt
-                  deriving (Show, Eq)

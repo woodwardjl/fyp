@@ -2,7 +2,7 @@ module Helper where
 
 import Data.List
 import Data.Char
-import Types
+import qualified Types as T
 
 splitlist :: Ord a => [a] -> ([a], [a])
 splitlist []   = ([], [])
@@ -22,10 +22,10 @@ isdigit :: String -> Bool
 isdigit []     = True
 isdigit (x:xs) = isDigit x && isdigit xs
 
-isinvalid :: [MToken] -> (Bool, String)
-isinvalid []                            = (False, "")
-isinvalid (x:xs) | fst x == MUndefined  = (True, snd x)
-                 | otherwise            = isinvalid xs
+isinvalid :: [T.Token] -> (Bool, String)
+isinvalid []                       = (False, "")
+isinvalid (x:xs) | fst x == T.Null = (True, snd x)
+                 | otherwise       = isinvalid xs
 
 isstr :: String -> Bool
 isstr []     = True
@@ -54,20 +54,23 @@ ischar = \x y -> x == y
 str :: String -> (String, String)
 str = \xs -> (takeWhile isAlpha xs, dropWhile isAlpha xs)
 
-iskeyword :: Lexeme -> Bool
-iskeyword = \xs -> xs `elem` ["begin", "if", "else", "define", "end", "not", 
-                              "neg", "print", "test", "rotatel", "rotater",
-                              "populate", "updateparents", "max"]           
+iskeyword :: T.Lexeme -> Bool
+iskeyword = \xs -> isprimarykeyword xs || isdatakeyword xs || isconditionalkeyword xs
+
+isprimarykeyword :: T.Lexeme -> Bool
+isprimarykeyword = \xs -> xs `elem` ["begin", "if", "else", "define", "end", "not", 
+                                     "neg", "print", "test", "rotatel", "rotater",
+                                     "populate", "updateparents", "max"]           
                               
-isdatakeyword :: Lexeme -> Bool                              
+isdatakeyword :: T.Lexeme -> Bool                              
 isdatakeyword = \xs -> xs `elem` ["adjustment", "factor", "leftchild", "rightchild", 
                                   "nodefactor", "heightl", "heightr", "data", "height"]
 
-isconditionalkeyword :: Lexeme -> Bool
+isconditionalkeyword :: T.Lexeme -> Bool
 isconditionalkeyword = \xs -> xs `elem` ["if", "else"]
 
-istype :: Lexeme -> Bool
+istype :: T.Lexeme -> Bool
 istype = \xs -> xs `elem` ["int", "decimal", "char", "string"]
 
-isoperator :: Lexeme -> Bool
+isoperator :: T.Lexeme -> Bool
 isoperator = \xs -> xs `elem` ["gt", "lt", "lteq", "gteq", "or", "and", "not", "eq"]

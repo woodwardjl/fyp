@@ -2,38 +2,29 @@ module Lexer where
 
 import Data.List.Split
 import Helper
-import Types
+import qualified Types as T
 import Token
 
-rmemptytoken :: [MToken] -> [MToken]
-rmemptytoken = filter (\(x, _) -> x /= MEmpty)
+rmemptytoken :: [T.Token] -> [T.Token]
+rmemptytoken = filter (\(x, _) -> x /= T.Null)
 
-rmemptyblock :: [[MToken]] -> [[MToken]]
+rmemptyblock :: [[T.Token]] -> [[T.Token]]
 rmemptyblock = filter (\x -> x /= [])
 
-rmbraceblock :: [[MToken]] -> [[MToken]]
-rmbraceblock = filter (\xs -> xs /= [(MBlockS, "{")] && xs /= [(MBlockF, "}")])
+rmbraceblock :: [[T.Token]] -> [[T.Token]]
+rmbraceblock = filter (\xs -> xs /= [(T.Block, "{")] && xs /= [(T.Block, "}")])
 
-rmterminatorblock :: [[MToken]] -> [[MToken]]
-rmterminatorblock = filter (\xs -> xs /= [(MTerminator, ";")])
+rmterminatorblock :: [[T.Token]] -> [[T.Token]]
+rmterminatorblock = filter (\xs -> xs /= [(T.Terminator, ";")])
 
-rmterminatorblock' :: [[[MToken]]] -> [[[MToken]]]
+rmterminatorblock' :: [[[T.Token]]] -> [[[T.Token]]]
 rmterminatorblock' = \xs -> [rmterminatorblock x | x <- xs]
 
-rmemptyexpr :: [[MToken]] -> [[MToken]]
+rmemptyexpr :: [[T.Token]] -> [[T.Token]]
 rmemptyexpr = filter (/= [])
 
-rmemptyexpr' :: [[[MToken]]] -> [[[MToken]]]
+rmemptyexpr' :: [[[T.Token]]] -> [[[T.Token]]]
 rmemptyexpr' = \xs -> [rmemptyexpr x | x <- xs]
-
--- @params: Tokens, StartBraceCount, EndBraceCount,
---          (StartBraceCount, EndBraceCount)                 
-bracecount :: [MToken] -> Int -> Int -> (Int, Int)
-bracecount [] cStart cEnd     = (cStart, cEnd)
-bracecount (x:xs) cStart cEnd
-    | fst x == MBlockS        = bracecount xs (cStart + 1) cEnd
-    | fst x == MBlockF        = bracecount xs cStart (cEnd + 1)
-    | otherwise               = bracecount xs cStart cEnd
 
 -- @params: EntireSourceCode, TokenizedSourceCode
 splitbytoken :: String -> [String]
@@ -46,19 +37,19 @@ splitbytoken xs
           second     = dropWhile (`notElem` chars) xs
 
 -- @params: TokenList, TokenListInBlockList          
-splitbyblock :: [MToken] -> [[MToken]]
+splitbyblock :: [T.Token] -> [[T.Token]]
 splitbyblock []     = []
 splitbyblock (x:xs) = [x] 
-                      : (takeWhile (\(y, _) -> y /= MBlockF && y /= MBlockS) xs)
-                      : splitbyblock (dropWhile (\(y, _) -> y /= MBlockF && y /= MBlockS) xs)
+                      : (takeWhile (\(y, _) -> y /= T.Block) xs)
+                      : splitbyblock (dropWhile (\(y, _) -> y /= T.Block) xs)
 
 -- @params: TokenList, TokenList                      
-splitbystatement :: [MToken] -> [[MToken]]
-splitbystatement = \xs -> splitWhen (== (MTerminator, ";")) xs
+splitbystatement :: [T.Token] -> [[T.Token]]
+splitbystatement = \xs -> splitWhen (== (T.Terminator, ";")) xs
 
 -- @params: TokenListInBlockList, TOkenListInExpressionListInBlockList
-splitbystatement' :: [[MToken]] -> [[[MToken]]]
+splitbystatement' :: [[T.Token]] -> [[[T.Token]]]
 splitbystatement' = \xs -> [splitbystatement x | x <- xs]
 
-tokenize :: String -> [MToken]
+tokenize :: String -> [T.Token]
 tokenize = \xs -> rmemptytoken [token x | x <- splitbytoken xs]

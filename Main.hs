@@ -1,6 +1,8 @@
 import Lexer
 import Helper
 import Errors
+import Parser
+import qualified Types as T
 
 main :: IO ()
 main = do
@@ -10,11 +12,8 @@ main = do
     -- ^assert brace tuple values equal: (\(x, y) -> x == y)
     if fst invalid
         then symbolerror (snd invalid) "undefined symbol"
-        else mapM_ (mapM_ print) $ 
-             rmemptyexpr'        $        
-             splitbystatement'   $   
-             -- rmbraceblock        $   
-      
-             rmemptyblock        $        
-             splitbyblock tokens
+        else mapM_ print $ 
+             rmemptyblock        $
+             splitbyblock tokens $ bracecnt tokens
+             
               

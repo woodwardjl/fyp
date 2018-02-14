@@ -1,9 +1,9 @@
 module Lexer where
 
 import Data.List.Split
-import Helper
 import qualified Types as T
 import Token
+import Helper
 
 rmemptytoken :: [T.Token] -> [T.Token]
 rmemptytoken = filter (\(x, _) -> x /= T.Null)
@@ -14,17 +14,15 @@ rmemptyblock = filter (\x -> x /= [])
 rmbraceblock :: [[T.Token]] -> [[T.Token]]
 rmbraceblock = filter (\xs -> xs /= [(T.Block, "{")] && xs /= [(T.Block, "}")])
 
-rmterminatorblock :: [[T.Token]] -> [[T.Token]]
-rmterminatorblock = filter (\xs -> xs /= [(T.Terminator, ";")])
-
-rmterminatorblock' :: [[[T.Token]]] -> [[[T.Token]]]
-rmterminatorblock' = \xs -> [rmterminatorblock x | x <- xs]
-
 rmemptyexpr :: [[T.Token]] -> [[T.Token]]
 rmemptyexpr = filter (/= [])
 
 rmemptyexpr' :: [[[T.Token]]] -> [[[T.Token]]]
 rmemptyexpr' = \xs -> [rmemptyexpr x | x <- xs]
+
+countbraces :: [T.Token] -> (Int, Int)
+countbraces xs = (length $ filter (== (T.Block, "{")) xs,
+                  length $ filter (== (T.Block, "}")) xs)
 
 -- @params: EntireSourceCode, TokenizedSourceCode
 splitbytoken :: String -> [String]
@@ -36,20 +34,22 @@ splitbytoken xs
           first      = takeWhile (`notElem` chars) xs
           second     = dropWhile (`notElem` chars) xs
 
--- @params: TokenList, TokenListInBlockList          
-splitbyblock :: [T.Token] -> [[T.Token]]
-splitbyblock []     = []
-splitbyblock (x:xs) = [x] 
-                      : (takeWhile (\(y, _) -> y /= T.Block) xs)
-                      : splitbyblock (dropWhile (\(y, _) -> y /= T.Block) xs)
+bracecnt :: [T.Token] -> (Int, Int)
+bracecnt = \xs -> (length $ filter (== (T.Block, "{")) xs,
+                   length $ filter (== (T.Block, "}")) xs)
 
--- @params: TokenList, TokenList                      
-splitbystatement :: [T.Token] -> [[T.Token]]
-splitbystatement = \xs -> splitWhen (== (T.Terminator, ";")) xs
+splitbyblock' :: [[T.Token]] -> (Int, Int) -> [[T.Token]]
+splitbyblock' (x:y:z:xs) cnt
+  | x == tblkstart
+    && y /= tblkstart
+    && z /= tblkstart  = concat [x, y, z] : splitbyblock' xs cnt
+  | otherwise          = x : splitbyblock' (y:z:xs) cnt
+  where tblkstart      = [(T.Block, "{")]
+splitbyblock' xs _     = xs
 
--- @params: TokenListInBlockList, TOkenListInExpressionListInBlockList
-splitbystatement' :: [[T.Token]] -> [[[T.Token]]]
-splitbystatement' = \xs -> [splitbystatement x | x <- xs]
+splitbyblock :: [T.Token] -> (Int, Int) -> [[T.Token]]
+splitbyblock xs cnt = splitbyblock'
+                      [x | x <- split (oneOf [(T.Block, "{"), (T.Block, "}")]) xs] cnt
 
 tokenize :: String -> [T.Token]
 tokenize = \xs -> rmemptytoken [token x | x <- splitbytoken xs]

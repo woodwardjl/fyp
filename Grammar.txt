@@ -1,0 +1,67 @@
+    -- Program Grammar
+    program              -> "begin" blockStmt* "end" ;
+
+    -- Statement Grammar
+    stmt                 -> defineStmt
+                        | assignmentStmt
+                        | conditionalStmt ;
+    defineStmt           -> "define" nodefactor type ":" blockStmt ;
+    assignmentStmt       -> keywordData ":" blockStmt;
+    conditionalStmt      -> "if" expr (":" | "else" expr ":") blockStmt ;
+    blockStmt            -> "{" stmt "}"
+   
+    -- Expression Grammar
+    expr                 -> exprAddSubstract ;
+    exprAddSubtract      -> exprMultDiv 
+                        | exprAddSubstract "plus" exprMultDiv
+                        | exprAddSubstract "neg" exprMultDiv ;
+    exprMultDiv          -> exprUnary
+                        | exprMultDiv "mult" exprUnary
+                        | exprMultDiv "div" exprUnary ;
+    exprUnary            -> exprPrimary
+                        | ("not" | "neg") exprPrimary ;
+    exprPrimary          -> grouping 
+                        | value ;
+    grouping             -> "(" expr ")" ;
+    value                -> keywordData
+                        | ("leftchild" | "rightchild") "." ("data" | "heightl" | "heightr" | "factor")
+                        | literal ;
+    literal              -> NUMBER 
+                        | "true" 
+                        | "false" ;
+    keywordPrimary       -> keywordData
+                        | keywordConditional
+                        | type
+                        | "begin"
+                        | "end" 
+                        | "define"
+                        | "print"
+                        | "test"
+                        | "rotatel"
+                        | "rotater"
+                        | "populate"
+                        | "updateparents"
+                        | "max" ;
+    keywordData          -> "factor" 
+                        | "leftchild" 
+                        | "rightchild"
+                        | "nodefactor"
+                        | "heightl"
+                        | "heightr"
+                        | "data" 
+                        | "adjustment"
+                        | "height" ;
+    keywordConditional   -> "if" 
+                        | "else" ;
+    type                 -> int ;                
+    operator             -> "eq" 
+                        | "noteq" 
+                        | "lt" 
+                        | "gt"
+                        | "lteq" 
+                        | "gteq" 
+                        | "plus" 
+                        | "not"
+                        | "neg" 
+                        | "mult" 
+                        | "div" ;

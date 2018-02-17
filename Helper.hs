@@ -75,10 +75,14 @@ istype = \xs -> xs `elem` ["int", "decimal", "char", "string"]
 isoperator :: T.Lexeme -> Bool
 isoperator = \xs -> xs `elem` ["gt", "lt", "lteq", "gteq", "or", "and", "not", "eq"]
 
-splitkeepdelim :: (Eq a) => [a] -> a -> Int -> [[a]]
-splitkeepdelim [] _ _ = []
-splitkeepdelim xs delim pos -- pos: 0: left, 1: right
-  | delim `elem` xs && pos == 0 = concat [takeWhile (/= delim) xs, [delim]]
-                                  : splitkeepdelim (tail $ dropWhile (/= delim) xs) delim pos
-  | otherwise = [xs]
+isblock :: [T.Token] -> Bool
+isblock = \x -> x == [(T.Block, "{")] || x == [(T.Block, "}")]
 
+-- @pos: 0 = left; 1 = right (unimplemented)
+splitkeepdelim :: (Eq a) => [a] -> a -> Int -> [[a]]
+splitkeepdelim [] _ _            = []
+splitkeepdelim xs delim pos
+  | delim `elem` xs && pos == 0  = concat [takeWhile (/= delim) xs, [delim]]
+                                  : splitkeepdelim
+                                  (tail $ dropWhile (/= delim) xs) delim pos
+  | otherwise                    = [xs]

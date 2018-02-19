@@ -14,17 +14,17 @@ getvar _         = error "should never occur."
 
 math :: (Int -> Int -> Int) -> T.Lexeme -> T.Lexeme -> Int
 math op x y
-  | not (isoperator x || isoperator y)  = strx `op` stry
-  | isoperator x  && isoperator y       = varx `op` vary
-  | isoperator x                        = varx `op` stry
-  | otherwise                           = strx `op` vary
-  where strx                            = strtoint x
-        stry                            = strtoint y
-        varx                            = getvar x
-        vary                            = getvar y
+  | isdatakeyword x && isdatakeyword y        = varx `op` vary
+  | not (isdatakeyword x) && isdatakeyword y  = strx `op` vary
+  | isdatakeyword x && not (isdatakeyword y)  = varx `op` stry
+  | otherwise                                 = strx `op` stry
+  where strx = strtoint x
+        stry = strtoint y
+        varx = getvar x
+        vary = getvar y
 
 eval :: [T.Token] -> [T.Expr]
-eval []         = [T.Other "empty"]
+eval []         = [T.Empty]
 eval ((_, x):(_, "plus"):(_, z):(T.Terminator, ";"):xs)
                 = T.AddSub T.PLUS x z: eval xs
 eval ((_, x):(_, "neg"):(_, z):(T.Terminator, ";"):xs)
@@ -33,7 +33,7 @@ eval ((_, x):(_, "mult"):(_, z):(T.Terminator, ";"):xs)
                 = T.MultDiv T.MULT x z : eval xs
 eval ((_, x):(_, "div"):(_, z):(T.Terminator, ";"):xs)
                 = T.MultDiv T.DIV x z : eval xs
-eval ((_,y):_)  = [T.Other y]
+eval ((_,y):_)  = [T.Empty] -- For further patterns.
 
 eval' :: [T.Expr] -> [T.Literal]
 eval' ((T.AddSub T.NEG x y):xs)    = T.IntValue (math (-) x y) : eval' xs

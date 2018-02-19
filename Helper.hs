@@ -59,9 +59,9 @@ iskeyword = \xs -> isprimarykeyword xs || isdatakeyword xs || isconditionalkeywo
 
 isprimarykeyword :: T.Lexeme -> Bool
 isprimarykeyword = \xs -> xs `elem` ["begin", "if", "else", "define", "end", "not", 
-                                     "neg", "print", "test", "rotatel", "rotater",
-                                     "populate", "updateparents", "max"]           
-                              
+                                     "print", "test", "rotatel", "rotater",
+                                     "populate", "updateparents", "max"]
+
 isdatakeyword :: T.Lexeme -> Bool                              
 isdatakeyword = \xs -> xs `elem` ["adjustment", "factor", "leftchild", "rightchild", 
                                   "nodefactor", "heightl", "heightr", "data", "height"]
@@ -73,16 +73,30 @@ istype :: T.Lexeme -> Bool
 istype = \xs -> xs `elem` ["int", "decimal", "char", "string"]
 
 isoperator :: T.Lexeme -> Bool
-isoperator = \xs -> xs `elem` ["gt", "lt", "lteq", "gteq", "or", "and", "not", "eq"]
+isoperator = \xs -> xs `elem` ["gt", "lt", "lteq", "gteq", "or", "and", "not", "eq",
+                              "plus", "div", "neg", "mult"]
 
 isblock :: [T.Token] -> Bool
 isblock = \x -> x == [(T.Block, "{")] || x == [(T.Block, "}")]
 
--- @pos: 0 = left; 1 = right (unimplemented)
 splitkeepdelim :: (Eq a) => [a] -> a -> Int -> [[a]]
 splitkeepdelim [] _ _            = []
-splitkeepdelim xs delim pos
-  | delim `elem` xs && pos == 0  = concat [takeWhile (/= delim) xs, [delim]]
-                                  : splitkeepdelim
-                                  (tail $ dropWhile (/= delim) xs) delim pos
+splitkeepdelim xs delim pos -- pos: 0: split token stays left; 1: split token goes right
+  | delim `elem` xs = if pos == 0 then concat [taken, [delim]]
+                                       : splitkeepdelim (tail dropped) delim pos
+                                  else taken
+                                       : [head $ dropped]
+                                       : splitkeepdelim (tail $ dropped) delim pos
   | otherwise                    = [xs]
+  where dropped                  = dropWhile (/= delim) xs
+        taken                    = takeWhile (/= delim) xs
+
+cnt :: (Eq a) => [a] -> [[a]] -> Int
+cnt p = length . filter (== p)
+
+takeWhileInclude :: (T.Token -> Bool) -> [T.Token] -> [T.Token]
+takeWhileInclude _ []      = []
+takeWhileInclude p (x:xs)  = x : if p x then takeWhileInclude p xs else []
+
+strtoint :: String -> Int
+strtoint x = read x :: Int

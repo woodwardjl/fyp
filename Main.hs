@@ -1,6 +1,7 @@
 import Lexer
 import Helper
 import Errors
+import Parser
 
 main :: IO ()
 main = do
@@ -9,6 +10,6 @@ main = do
     let invalid = isinvalid tokens
     if fst invalid
         then symbolerror (snd invalid) "undefined symbol"
-        else mapM_ print $
-             rmemptyblock $
-             splitbyblock tokens
+        else print $ -- eval' $ 
+      eval tokens
+

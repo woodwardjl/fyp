@@ -28,8 +28,5 @@ splitbytoken xs
           first     = takeWhile (`notElem` chars) xs
           second    = dropWhile (`notElem` chars) xs
 
-splitbyblock :: [T.Token] -> [[T.Token]]
-splitbyblock = split (oneOf [(T.Block, "{"), (T.Block, "}")])
-
 tokenize :: String -> [T.Token]
 tokenize = \xs -> rmemptytoken [token x | x <- splitbytoken xs]

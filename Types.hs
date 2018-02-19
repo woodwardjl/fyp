@@ -20,5 +20,5 @@ data Operator   = GT | LT | GTEQ | LTEQ | NOTEQ | PLUS | NEG | NOT | MULT | DIV
 data Expr       = I Literal
                   | AddSub Operator String String
                   | MultDiv Operator String String
-                  | Other String
+                  | Empty
                   deriving (Show, Eq)

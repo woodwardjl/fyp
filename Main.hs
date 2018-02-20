@@ -10,6 +10,6 @@ main = do
     let invalid = isinvalid tokens
     if fst invalid
         then symbolerror (snd invalid) "undefined symbol"
-        else print $ -- eval' $ 
-      eval tokens
+        else mapM_ print $ -- eval' $ 
+             eval tokens
 

@@ -7,18 +7,20 @@ data TokenType  = Keyword | Type | Operator | Literal | Block | Null
                   | Accessor | Definer | Terminator
                   deriving (Show, Eq)
 
-data Keyword    = ConditionalKeyword | DataKeyword | PrimaryKeyword
-                  deriving (Show, Eq)
-
 data Literal    = IntValue Int
                   | StrValue String
                   deriving (Show, Eq)
 
-data Operator   = GT | LT | GTEQ | LTEQ | NOTEQ | PLUS | NEG | NOT | MULT | DIV
+data Operator   = MathOperator | GT | LT | GTEQ | LTEQ | NOTEQ | NOT
                   deriving (Show, Eq)
 
-data Expr       = I Literal
-                  | AddSub Operator String String
-                  | MultDiv Operator String String
+data MathOperator = PLUS | NEG | MULT | DIV
+                    deriving (Show, Eq)
+
+data Expr       = Value Literal
+                  | Function String
+                  | AddSub MathOperator String String
+                  | MultDiv MathOperator String String
+                  | If [Expr] Operator [Expr]
                   | Empty
                   deriving (Show, Eq)

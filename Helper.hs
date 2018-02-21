@@ -22,10 +22,10 @@ isdigit :: String -> Bool
 isdigit []     = True
 isdigit (x:xs) = isDigit x && isdigit xs
 
-isinvalid :: [T.Token] -> (Bool, String)
-isinvalid []                       = (False, "")
-isinvalid (x:xs) | fst x == T.Null = (True, snd x)
-                 | otherwise       = isinvalid xs
+isinvalid :: [T.Token] -> (Bool, T.Token)
+isinvalid []                       = (False, T.Null)
+isinvalid (x:xs) | x == T.Null = (True, x)
+                 | otherwise   = isinvalid xs
 
 isstr :: String -> Bool
 isstr []     = True
@@ -73,11 +73,9 @@ istype :: T.Lexeme -> Bool
 istype = \xs -> xs `elem` ["int", "decimal", "char", "string"]
 
 isoperator :: T.Lexeme -> Bool
-isoperator = \xs -> xs `elem` ["gt", "lt", "lteq", "gteq", "or", "and", "not", "eq",
-                              "plus", "div", "neg", "mult"]
-
-isblock :: [T.Token] -> Bool
-isblock = \x -> x == [(T.Block, "{")] || x == [(T.Block, "}")]
+isoperator = \xs -> xs `elem` ["plus", "div", "minus", "mult"]
+-- isoperator = \xs -> xs `elem` ["gt", "lt", "lteq", "gteq", "or", "and", "not", "eq",
+--                               "plus", "div", "neg", "mult"]
 
 splitkeepdelim :: (Eq a) => [a] -> a -> Int -> [[a]]
 splitkeepdelim [] _ _            = []

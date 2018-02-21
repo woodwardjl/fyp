@@ -1,7 +1,6 @@
 module Variables where
 
-import qualified Types as T
-
+-- Temp variables for imp. practice.
 factor :: Int
 factor = 0
 
@@ -16,3 +15,4 @@ mdata = 0
 
 height :: Int
 height = 0
+-- End Temp variables for imp. practice.

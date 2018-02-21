@@ -1,26 +1,21 @@
 module Types where
 
-type Token      = (TokenType, Lexeme)
-type Lexeme     = String
+type Lexeme = String
 
-data TokenType  = Keyword | Type | Operator | Literal | Block | Null
-                  | Accessor | Definer | Terminator
-                  deriving (Show, Eq)
+data Tree   = AddSubNode Operator Tree Tree
+              | MultDivNode Operator Tree Tree
+              | UnaryNode Operator Tree
+              | LiteralNode Int
+              deriving (Show, Eq)
 
-data Literal    = IntValue Int
-                  | StrValue String
-                  deriving (Show, Eq)
+data Token = TokenOperator Operator
+             | TokenBraceL
+             | TokenBraceR
+             | TokenInt Int
+             | TokenData Int
+             | TokenTerminator
+             | Null
+             deriving (Show, Eq)
 
-data Operator   = MathOperator | GT | LT | GTEQ | LTEQ | NOTEQ | NOT
-                  deriving (Show, Eq)
-
-data MathOperator = PLUS | NEG | MULT | DIV
-                    deriving (Show, Eq)
-
-data Expr       = Value Literal
-                  | Function String
-                  | AddSub MathOperator String String
-                  | MultDiv MathOperator String String
-                  | If [Expr] Operator [Expr]
-                  | Empty
-                  deriving (Show, Eq)
+data Operator = Plus | Minus | Mult | Div
+                deriving (Show, Eq)

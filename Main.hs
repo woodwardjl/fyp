@@ -1,6 +1,7 @@
 import Lexer
 import Helper
 import Parser
+import AST
 
 main :: IO ()
 main = do

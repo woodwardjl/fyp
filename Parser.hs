@@ -65,11 +65,11 @@ astbuild []       = []
 astbuild (x:xs)   = drawVerticalTree (astconvert x) : astbuild xs  
 
 astconvert :: T.Tree -> PrettyT.Tree String
-astconvert (T.LiteralNode x)        = PrettyT.Node ("lit: (" ++ show x ++ ")") []
+astconvert (T.LiteralNode x)        = PrettyT.Node ("(" ++ show x ++ ")") []
 astconvert (T.DataNode xs x)        = PrettyT.Node("(" ++ xs ++ ": " ++ show x ++ ")") []
 astconvert (T.UnaryNode o r)        = PrettyT.Node (show o)
                                       [astconvert r]
-astconvert (T.AddSubNode o l r)     = PrettyT.Node ("addsub: (" ++ show o ++ ")")
+astconvert (T.AddSubNode o l r)     = PrettyT.Node ("(" ++ show o ++ ")")
                                       [astconvert l, astconvert r]
 astconvert (T.MultDivNode o l r)    = PrettyT.Node ("(" ++ show o ++ ")")
                                       [astconvert l, astconvert r]

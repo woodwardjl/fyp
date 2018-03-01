@@ -3,7 +3,6 @@ module Lexer where
 import Data.List.Split
 import qualified Types as T
 import Token
-import Operators
 
 rmemptytoken :: [T.Token] -> [T.Token]
 rmemptytoken = filter (/= T.Null)
@@ -11,8 +10,11 @@ rmemptytoken = filter (/= T.Null)
 rmemptyblock :: [[T.Token]] -> [[T.Token]]
 rmemptyblock = filter (/= [])
 
-splitbyterminator :: [T.Token] -> [[T.Token]]
-splitbyterminator = splitWhen (==T.TokenTerminator)
+tokensbuild :: String -> [[T.Token]]
+tokensbuild = rmemptyblock
+              . splitWhen (== T.TokenTerminator)
+              . rmemptytoken
+              . tokenize
 
 peek :: [T.Token] -> T.Token
 peek []     = T.TokenTerminator
@@ -22,38 +24,38 @@ toktail :: [T.Token] -> [T.Token]
 toktail []      = error "shouldn't happen."
 toktail (_:xs)  = xs
 
-expr :: [T.Token] -> (T.Tree, [T.Token])
-expr tokens =
-  case peek tokens' of
-    (T.TokenOperator op)
-      | op `elem` [T.Plus, T.Minus] -> (T.AddSubNode op primaryTree exprTree, tokens'')
-    _ -> (primaryTree, tokens')
-  where (primaryTree, tokens') = term tokens
-        (exprTree, tokens'') = expr (toktail tokens')
+expression :: [T.Token] -> (T.Tree, [T.Token])
+expression toks = 
+   let (termTree, toks') = term toks
+   in
+      case peek toks' of
+         (T.TokenOperator op) | elem op [T.Plus, T.Minus] -> 
+                                let (exTree, toks'') = expression (toktail toks') 
+                                in (T.AddSubNode op termTree exTree, toks'')
+         _ -> (termTree, toks')
 
 term :: [T.Token] -> (T.Tree, [T.Token])
-term tokens =
-  case peek tokens' of
-    (T.TokenOperator op)
-      | op `elem` [T.Mult, T.Div] -> (T.MultDivNode op primaryTree termTree, toks'')
-    _                             -> (primaryTree, tokens')
-  where (termTree, toks'')      = term tokens'
-        (primaryTree, tokens')  = primary tokens
-        
+term toks = 
+   let (facTree, toks') = factor toks
+   in
+      case peek toks' of
+         (T.TokenOperator op) | elem op [T.Mult, T.Div] ->
+                                let (termTree, toks'') = term (toktail toks') 
+                                in (T.MultDivNode op facTree termTree, toks'')
+         _ -> (facTree, toks')
 
-primary :: [T.Token] -> (T.Tree, [T.Token])
-primary tokens = 
-  case peek tokens of
-    T.TokenInt x                    -> (T.LiteralNode x, toktail tokens)
-    T.TokenData x                   -> (T.LiteralNode x, toktail tokens)
-    T.TokenOperator op
-      | op `elem` [T.Plus, T.Minus] -> (T.UnaryNode op primaryTree, opTokens)
-    T.TokenBraceL                   -> if peek exprTokens /= T.TokenBraceR
-                                       then error "right brace??"
-                                       else (exprTree, exprTokens)
-    _                               -> error "invalid tokens XD"
-  where (primaryTree, opTokens) = primary $ toktail tokens
-        (exprTree, exprTokens)  = expr $ toktail tokens
+factor :: [T.Token] -> (T.Tree, [T.Token])
+factor toks = 
+   case peek toks of
+      (T.TokenInt x)     -> (T.LiteralNode x, toktail toks)
+      (T.TokenOperator op) | elem op [T.Plus, T.Minus] -> 
+                             let (facTree, toks') = factor (toktail toks) 
+                             in (T.UnaryNode op facTree, toks')
+      T.TokenBraceL      -> 
+         let (expTree, toks') = expression (toktail toks)
+         in (expTree, toktail toks')
+      T.TokenData xs x   -> (T.DataNode xs x, toktail toks)
+      _ -> error $ "Parse error on token: " ++ show toks
 
 splitbytoken :: String -> [String]
 splitbytoken []     = []
@@ -72,4 +74,4 @@ parse' = \xs -> [parse x | x <- xs]
 
 parse :: [T.Token] -> T.Tree
 parse tokens = tree
-  where (tree, _) = expr tokens
+  where (tree, _) = expression tokens

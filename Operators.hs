@@ -26,30 +26,3 @@ op "mult"  = T.Mult
 op "div"   = T.Div
 op _       = error "shouldn't happen."
 
--- op :: T.Operator -> (Int -> Int -> Bool)
--- op T.GT     = (>)
--- op T.LT     = (<)
--- op T.GTEQ   = (>=)
--- op T.LTEQ   = (<=)
--- op T.NOTEQ  = (/=)
--- op _        = error "shouldn't happen."
-
--- optotype :: T.Lexeme -> T.Operator
--- optotype "lt"     = T.LT
--- optotype "gt"     = T.GT
--- optotype "gteq"   = T.GTEQ
--- optotype "lteq"   = T.LTEQ
--- optotype "noteq"  = T.NOTEQ
--- optotype "not"    = T.NOT
--- optotype _        = error "shouldn't happen."
-
--- math :: (Int -> Int -> Int) -> T.Lexeme -> T.Lexeme -> Int
--- math o x y
---   | isdatakeyword x && isdatakeyword y        = varx `o` vary
---   | not (isdatakeyword x) && isdatakeyword y  = strx `o` vary
---   | isdatakeyword x && not (isdatakeyword y)  = varx `o` stry
---   | otherwise                                 = strx `o` stry
---   where strx = strtoint x
---         stry = strtoint y
---         varx = getvar x
---         vary = getvar y

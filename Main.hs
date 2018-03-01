@@ -1,10 +1,14 @@
 import Lexer
 import Helper
-import Errors
+import Bst
 
 main :: IO ()
 main = do
     filecontent <- readFile "./Example.fyp"
-    -- print . parse' . rmemptyblock . splitbyterminator . rmemptytoken . tokenize $ concat [l | l <- lines filecontent, not (iscomment l)]
-    print $ rmemptyblock $ splitbyterminator $ rmemptytoken $ tokenize $ concat [l | l <- lines filecontent, not (iscomment l)]
+    mapM_ putStrLn
+      . astbuild
+      . parse'
+      . tokensbuild
+      . concat $ [l | l <- lines filecontent, not (iscomment l)]
+    -- mapM_ putStrLn . astbuild . parse' . rmemptyblock . splitbyterminator . rmemptytoken . tokenize . concat $ [x | x <- lines filecontent, not (iscomment x)]
     

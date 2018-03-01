@@ -101,9 +101,3 @@ strtoint x = read x :: Int
 
 inttostr :: Int -> String
 inttostr x = show x
-
-removequotations :: String -> String
-removequotations [] = []
-removequotations (x:xs)
-  | x == '\"' = removequotations xs
-  | otherwise = x : removequotations xs

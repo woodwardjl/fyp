@@ -7,7 +7,7 @@ import Variables
 getvar :: T.Lexeme -> Int
 getvar "heightl" = heightl
 getvar "heightr" = heightr
-getvar "factor"  = factor
+getvar "factor"  = factorv
 getvar "mdata"   = mdata
 getvar "height"  = height
 getvar x         = strtoint x

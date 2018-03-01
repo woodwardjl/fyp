@@ -1,21 +1,13 @@
 module Bst where
 
 import Helper
-import qualified Data.Tree as PrettyT
-import qualified Types as T
 import Data.Tree.Pretty
+import qualified Data.Tree as PrettyT
 
 data Tree a = Leaf | Node (Tree a) a (Tree a) deriving Show
 
-t :: Tree Int
-t = tmake [1, 2, 3, 4, 5, 6, 7, 8, 9]
-
 tprint :: Show a => Tree a -> IO ()
 tprint  = putStrLn . (drawVerticalTree . tconvert)
-
-astbuild :: [T.Tree] -> [String]
-astbuild [] = []
-astbuild (x:xs) = drawVerticalTree (astconvert x) : astbuild xs
 
 tinsert :: Ord a => a -> Tree a -> Tree a
 tinsert x (Leaf)       = (Node Leaf x Leaf)
@@ -71,15 +63,6 @@ tconvert :: Show a => Tree a -> PrettyT.Tree String
 tconvert Leaf              = PrettyT.Node "LEAF" []
 tconvert (Node l y r)      = PrettyT.Node ("(" ++ show y ++ ")")
                              [tconvert l, tconvert r]
-
-astconvert :: T.Tree -> PrettyT.Tree String
-astconvert (T.LiteralNode x)      = PrettyT.Node ("(" ++ show x ++ ")") []
-astconvert (T.DataNode xs x)      = PrettyT.Node("(" ++ xs ++ ": " ++ show x ++ ")") []
-astconvert (T.UnaryNode o r)      = PrettyT.Node (show o) [astconvert r]
-astconvert (T.AddSubNode o l r)   = PrettyT.Node ("(" ++ show o ++ ")")
-                                    [astconvert l, astconvert r]
-astconvert (T.MultDivNode o l r)  = PrettyT.Node ("(" ++ show o ++ ")")
-                                    [astconvert l, astconvert r]
 
 tbalance :: Ord a => Tree a -> Tree a
 tbalance (Leaf)            = Leaf

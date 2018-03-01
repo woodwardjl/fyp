@@ -1,8 +1,8 @@
 module Variables where
 
 -- Temp variables for imp. practice.
-factor :: Int
-factor = 0
+factorv :: Int
+factorv = 0
 
 heightl :: Int
 heightl = 10

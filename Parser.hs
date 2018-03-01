@@ -9,58 +9,71 @@ peek []     = T.TokenTerminator
 peek (x:_)  = x
 
 toktail :: [T.Token] -> [T.Token]
-toktail []      = error "shouldn't happen."
+toktail []      = error "shouldn't happenXDXD."
 toktail (_:xs)  = xs
 
-expression :: [T.Token] -> (T.Tree, [T.Token])
-expression toks = 
-   let (termTree, toks') = term toks
-   in
-      case peek toks' of
-         (T.TokenOperator op) | elem op [T.Plus, T.Minus]
-           -> let (exTree, toks'') = expression (toktail toks') 
-                                   in (T.AddSubNode op termTree exTree, toks'')
-         _ -> (termTree, toks')
+expr :: [T.Token] -> (T.Tree, [T.Token])
+expr = addsubexpr
 
-term :: [T.Token] -> (T.Tree, [T.Token])
-term toks = 
-   let (facTree, toks') = factor toks
-   in
-      case peek toks' of
-         (T.TokenOperator op) | elem op [T.Mult, T.Div]
-           -> let (termTree, toks'') = term (toktail toks') 
-                                   in (T.MultDivNode op facTree termTree, toks'')
-         _ -> (facTree, toks')
+addsubexpr :: [T.Token] -> (T.Tree, [T.Token])
+addsubexpr toks = let (multdivtree, toks') = multdivexpr toks
+                  in
+                    case peek toks' of
+                      (T.TokenOperator op) | elem op [T.Plus, T.Minus]
+                                  -> let (addsubtree, toks'') = expr $ toktail toks'
+                             in (T.AddSubNode op multdivtree addsubtree, toks'')
+                      _           -> (multdivtree, toks')
 
-factor :: [T.Token] -> (T.Tree, [T.Token])
-factor toks = 
-   case peek toks of
-      (T.TokenInt x)   -> (T.LiteralNode x, toktail toks)
-      (T.TokenOperator op) | elem op [T.Plus, T.Minus]
-                       -> let (facTree, toks') = factor (toktail toks) 
-                                in (T.UnaryNode op facTree, toks')
-      T.TokenBraceL    -> 
-         let (expTree, toks') = expression (toktail toks)
-         in (expTree, toktail toks')
-      T.TokenData xs x -> (T.DataNode xs x, toktail toks)
-      _                -> error $ "Parse error on token: " ++ show toks
+multdivexpr :: [T.Token] -> (T.Tree, [T.Token])
+multdivexpr toks = let (primarytree, toks') = conditionalexpr toks
+                   in
+                     case peek toks' of
+                       T.TokenOperator op | op `elem` [T.Mult, T.Div]
+                                  -> let (primarytree', toks'') = multdivexpr (toktail toks')
+                              in (T.MultDivNode op primarytree primarytree', toks'')
+                       _          -> (primarytree, toks')
+
+conditionalexpr :: [T.Token] -> (T.Tree, [T.Token])
+conditionalexpr toks = let (conditionaltree, toks') = exprprimary toks
+                       in
+                         case peek toks' of
+                           T.TokenComparison op
+                                  -> let (primarytree, toks'') = multdivexpr (toktail toks') 
+                                 in (T.ComparisonNode op primarytree conditionaltree, toks'')
+                           _      -> (conditionaltree, toks')
+
+exprprimary :: [T.Token] -> (T.Tree, [T.Token])
+exprprimary toks = case peek toks of
+                     T.TokenInt x -> (T.LiteralNode x, toktail toks)
+                     T.TokenBraceL
+                                  -> let (expTree, toks') = expr (toktail toks)
+                            in (expTree, toktail toks')
+                     T.TokenConditional o
+                                  -> let (termTree, toks') = multdivexpr (toktail toks)
+                            in (T.ConditionalNode o termTree, toks')         
+                     _            -> error $ "Parse error on token: " ++ show (peek toks)
 
 parse' :: [[T.Token]] -> [T.Tree]
 parse' = \xs -> [parse x | x <- xs]
 
 parse :: [T.Token] -> T.Tree
-parse tokens       = tree
-  where (tree, _)  = expression tokens
+parse tokens      = tree
+  where (tree, _) = expr tokens
 
 astbuild :: [T.Tree] -> [String]
-astbuild []      = []
-astbuild (x:xs)  = drawVerticalTree (astconvert x) : astbuild xs  
+astbuild []       = []
+astbuild (x:xs)   = drawVerticalTree (astconvert x) : astbuild xs  
 
 astconvert :: T.Tree -> PrettyT.Tree String
-astconvert (T.LiteralNode x)      = PrettyT.Node ("(" ++ show x ++ ")") []
-astconvert (T.DataNode xs x)      = PrettyT.Node("(" ++ xs ++ ": " ++ show x ++ ")") []
-astconvert (T.UnaryNode o r)      = PrettyT.Node (show o) [astconvert r]
-astconvert (T.AddSubNode o l r)   = PrettyT.Node ("(" ++ show o ++ ")")
-                                    [astconvert l, astconvert r]
-astconvert (T.MultDivNode o l r)  = PrettyT.Node ("(" ++ show o ++ ")")
-                                    [astconvert l, astconvert r]
+astconvert (T.LiteralNode x)        = PrettyT.Node ("lit: (" ++ show x ++ ")") []
+astconvert (T.DataNode xs x)        = PrettyT.Node("(" ++ xs ++ ": " ++ show x ++ ")") []
+astconvert (T.UnaryNode o r)        = PrettyT.Node (show o)
+                                      [astconvert r]
+astconvert (T.AddSubNode o l r)     = PrettyT.Node ("addsub: (" ++ show o ++ ")")
+                                      [astconvert l, astconvert r]
+astconvert (T.MultDivNode o l r)    = PrettyT.Node ("(" ++ show o ++ ")")
+                                      [astconvert l, astconvert r]
+astconvert (T.ConditionalNode o r)  = PrettyT.Node ("(" ++ show o ++ ")")
+                                      [astconvert r]
+astconvert (T.ComparisonNode o r l) = PrettyT.Node ("(" ++ show o ++ ")")
+                                      [astconvert l, astconvert r]

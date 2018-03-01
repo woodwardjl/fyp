@@ -10,6 +10,11 @@ splitlist xs   = (take half xs', drop half xs')
     where half = length xs `div` 2
           xs'  = sort xs
 
+splitlist' :: [a] -> ([a], [a])
+splitlist' [] = ([], [])
+splitlist' xs = (take half xs, drop half xs)
+  where half = length xs `div` 2
+
 rmdups :: Eq a => [a] -> [a]
 rmdups []                   = []
 rmdups (x:xs) | x `elem` xs = rmdups xs
@@ -36,7 +41,7 @@ isalphanum []      = True
 isalphanum (x:xs)  = (isAlpha x || isDigit x) && isalphanum xs
 
 isliteral :: String -> Bool
-isliteral = \xs -> isdigit xs || isstr xs || isalphanum xs
+isliteral = \xs -> isdigit xs 
 
 iscomment :: String -> Bool
 iscomment (x:y:xs) | isspace x             = iscomment (y:xs)
@@ -58,9 +63,12 @@ iskeyword :: T.Lexeme -> Bool
 iskeyword = \xs -> isprimarykeyword xs || isdatakeyword xs || isconditionalkeyword xs
 
 isprimarykeyword :: T.Lexeme -> Bool
-isprimarykeyword = \xs -> xs `elem` ["begin", "if", "else", "define", "end", "not", 
+isprimarykeyword = \xs -> xs `elem` ["begin", "define", "end", "not", 
                                      "print", "test", "rotatel", "rotater",
                                      "populate", "updateparents", "max"]
+
+iscomparsionkeyword :: T.Lexeme -> Bool
+iscomparsionkeyword = \xs -> xs `elem` ["gt", "lt", "gteq", "lteq", "noteq", "eq"]
 
 isdatakeyword :: T.Lexeme -> Bool                              
 isdatakeyword = \xs -> xs `elem` ["adjustment", "factor", "leftchild", "rightchild", 
@@ -74,8 +82,6 @@ istype = \xs -> xs `elem` ["int", "decimal", "char", "string"]
 
 isoperator :: T.Lexeme -> Bool
 isoperator = \xs -> xs `elem` ["plus", "div", "minus", "mult"]
--- isoperator = \xs -> xs `elem` ["gt", "lt", "lteq", "gteq", "or", "and", "not", "eq",
---                               "plus", "div", "neg", "mult"]
 
 splitkeepdelim :: (Eq a) => [a] -> a -> Int -> [[a]]
 splitkeepdelim [] _ _            = []

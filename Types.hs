@@ -5,7 +5,7 @@ type Lexeme = String
 data Tree   = AddSubNode Operator Tree Tree
               | MultDivNode Operator Tree Tree
               | UnaryNode Operator Tree
-              | DataNode String Int
+              | DataNode Lexeme Int
               | LiteralNode Int
               | ConditionalNode Conditional Tree
               | ComparisonNode Comparison Tree Tree
@@ -15,7 +15,7 @@ data Token = TokenOperator Operator
              | TokenBraceL
              | TokenBraceR
              | TokenInt Int
-             | TokenData String Int
+             | TokenData Lexeme Int
              | TokenTerminator
              | TokenDefiner
              | TokenBlockL

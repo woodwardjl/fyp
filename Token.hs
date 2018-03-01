@@ -19,4 +19,6 @@ token xs
                                    ":"  -> T.TokenDefiner
                                    "("  -> T.TokenBraceL
                                    ")"  -> T.TokenBraceR
+                                   "{"  -> T.TokenBlockL
+                                   "}"  -> T.TokenBlockR
                                    _    -> error $ "invalid symbol/value: " ++ xs

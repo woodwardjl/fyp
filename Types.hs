@@ -9,6 +9,9 @@ data Tree   = AddSubNode Operator Tree Tree
               | LiteralNode Int
               | ConditionalNode Conditional Tree
               | ComparisonNode Comparison Tree Tree
+              | GroupingNode Token Tree Token
+              | DefineNode Token Tree Token
+              | BlockNode Token Tree Token
               deriving (Show, Eq)
 
 data Token = TokenOperator Operator

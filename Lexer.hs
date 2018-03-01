@@ -12,7 +12,7 @@ rmemptyblock = filter (/= [])
 
 tokensbuild :: String -> [[T.Token]]
 tokensbuild = rmemptyblock
-              . splitWhen (== T.TokenTerminator)
+              . splitWhen (==T.TokenTerminator)
               . rmemptytoken
               . tokenize
 

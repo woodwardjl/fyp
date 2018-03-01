@@ -21,3 +21,9 @@ astconvert (T.ConditionalNode o r)  = PrettyT.Node ("(" ++ show o ++ ")")
                                       [astconvert r]
 astconvert (T.ComparisonNode o r l) = PrettyT.Node ("(" ++ show o ++ ")")
                                       [astconvert l, astconvert r]
+astconvert (T.GroupingNode _ t _)   = PrettyT.Node ("GROUPING")
+                                      [astconvert t]
+astconvert (T.DefineNode _ t _)     = PrettyT.Node ("BLOCK")
+                                      [astconvert t]
+astconvert (T.BlockNode _ t _)      = PrettyT.Node ("BLOCK")
+                                      [astconvert t]

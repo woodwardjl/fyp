@@ -3,6 +3,7 @@ module Lexer where
 import Data.List.Split
 import qualified Types as T
 import Token
+import Helper
 
 rmemptytoken :: [T.Token] -> [T.Token]
 rmemptytoken = filter (/= T.Null)
@@ -10,9 +11,12 @@ rmemptytoken = filter (/= T.Null)
 rmemptyblock :: [[T.Token]] -> [[T.Token]]
 rmemptyblock = filter (/= [])
 
+splittokens :: [T.Token] -> [[T.Token]]
+splittokens xs = splitkeepdelim xs T.TokenBraceL 0
+
 tokensbuild :: String -> [[T.Token]]
 tokensbuild = rmemptyblock
-              . splitWhen (==T.TokenTerminator) 
+              . splitWhen (==T.Null)
               . rmemptytoken
               . tokenize
 

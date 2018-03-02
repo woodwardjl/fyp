@@ -18,7 +18,7 @@ astconvert (T.AddSubNode o l r)       = PrettyT.Node ("(" ++ show o ++ ")")
                                         [astconvert l, astconvert r]
 astconvert (T.MultDivNode o l r)      = PrettyT.Node ("(" ++ show o ++ ")")
                                         [astconvert l, astconvert r]
-astconvert (T.ConditionalNode o l r r')     = PrettyT.Node ("(" ++ show o ++ ")")
+astconvert (T.ConditionalNode o l r r')     = PrettyT.Node ("(if-else)")
                                          [astconvert l, astconvert r, astconvert r']
 astconvert (T.ComparisonNode o r l)   = PrettyT.Node ("(" ++ show o ++ ")")
                                         [astconvert l, astconvert r]

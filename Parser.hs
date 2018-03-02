@@ -1,12 +1,9 @@
 module Parser where
 
 import qualified Types as T
-import Data.Tree.Pretty
-import qualified Data.Tree as PrettyT
-import System.Exit
 
 peek :: [T.Token] -> T.Token
-peek []     = T.TokenTerminator
+peek []     = T.Null
 peek (x:_)  = x
 
 toktail :: [T.Token] -> [T.Token]
@@ -61,6 +58,7 @@ exprprimary toks = case peek toks of
                                           in (T.ConditionalNode o primarytree primarytree'
                                               primarytree'', toks'')
                      t                 -> error $ "unable to parse token: " ++ show t
+                     
 parse' :: [[T.Token]] -> [T.Tree]
 parse' = \xs -> [parse x | x <- xs]
 

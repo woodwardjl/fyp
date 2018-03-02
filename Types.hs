@@ -11,6 +11,7 @@ data Tree   = AddSubNode Operator Tree Tree
               | ComparisonNode Comparison Tree Tree
               | GroupingNode Token Tree Token
               | BlockNode Token Tree Token
+              | DefinitionNode String Tree
               | LeafNode
               deriving (Show, Eq)
 
@@ -19,11 +20,9 @@ data Token = TokenOperator Operator
              | TokenBraceR
              | TokenInt Int
              | TokenData Lexeme Int
-             | TokenTerminator
-             | TokenBlockL
-             | TokenBlockR
              | TokenConditional Conditional
              | TokenComparison Comparison
+             | TokenDefiner Lexeme
              | Null
              deriving (Show, Eq)
 

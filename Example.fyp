@@ -1,0 +1,63 @@
+(if (10 iseq 10)
+  (5 plus 5)
+  (4 mult 10))
+
+(def factor
+	 (heightr minus heightl))
+
+
+-- begin {    
+--     define nodefactor int: {
+--         factor: {
+--             heightr "neg" heightl;
+--         }
+--         adjustment: {
+--             if factor gt 1 or factor lt neg 1: {
+--                 height: {
+--                     1 "plus" max leftchild.height rightchild.height;
+--                 }
+                
+--                 factor: {
+--                     heightr "neg" heightl;
+--                 }
+
+--                 if factor gt 1: {
+--                     if data lt leftchild.data: {
+--                         rotater;
+--                     } else {
+--                         -- 
+--                     }
+
+--                     if data gt leftchild.data: {
+--                         rotatel leftchild;
+--                         rotater;
+--                     }
+--                 }
+
+--                 if factor lt neg 1: {
+--                     if data gt rightchild.data: {
+--                         if bla lt bla2: {
+--                            if bla2 gt bla3: {
+--                               rotatel;                              
+--                            }
+--                         }
+--                         rotatel;
+--                     if data lt leftchild.data: {
+--                         rotater;
+--                     }
+--                 }
+--                    if data lt rightchild.data: {
+--                        rotater rightchild;
+--                        rotatel;
+--                   }
+--               } 
+--             }
+--         }
+--     }
+--     populate 20;
+--     print;
+
+--     insert 14;
+--     print;
+-- }
+-- end

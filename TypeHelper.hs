@@ -38,4 +38,10 @@ comparison "lteq"   = T.CLTEQ
 comparison "gteq"   = T.CGTEQ
 comparison "noteq"  = T.CNOTEQ
 comparison "eq"     = T.CEQ
+comparison "iseq"   = T.CISEQ
 comparison _        = error "shouldn't happen"
+
+val :: T.Token -> Int
+val (T.TokenInt x)     = x
+val (T.TokenData _ x)  = x
+val _                  = error "shouldn't happen..."

@@ -1,13 +1,16 @@
 module Parser where
 
 import qualified Types as T
+import Data.Tree.Pretty
+import qualified Data.Tree as PrettyT
+import System.Exit
 
 peek :: [T.Token] -> T.Token
 peek []     = T.TokenTerminator
 peek (x:_)  = x
 
 toktail :: [T.Token] -> [T.Token]
-toktail []      = error "shouldn't happen."
+toktail []      = []
 toktail (_:xs)  = xs
 
 expr :: [T.Token] -> (T.Tree, [T.Token])
@@ -18,12 +21,12 @@ addsubexpr toks = let (multdivtree, toks') = multdivexpr toks
                   in
                     case peek toks' of
                       T.TokenOperator op | elem op [T.Plus, T.Minus]
-                                  -> let (addsubtree, toks'') = expr $ toktail toks'
-                                     in (T.AddSubNode op multdivtree addsubtree, toks'')
+                                  -> let (exprtree, toks'') = expr $ toktail toks'
+                                     in (T.AddSubNode op multdivtree exprtree, toks'')
                       _           -> (multdivtree, toks')
 
 multdivexpr :: [T.Token] -> (T.Tree, [T.Token])
-multdivexpr toks = let (primarytree, toks') = conditionalexpr toks
+multdivexpr toks = let (primarytree, toks') = comparisonexpr toks
                    in
                      case peek toks' of
                        T.TokenOperator op | op `elem` [T.Mult, T.Div]
@@ -31,32 +34,33 @@ multdivexpr toks = let (primarytree, toks') = conditionalexpr toks
                                      in (T.MultDivNode op primarytree primarytree', toks'')
                        _          -> (primarytree, toks')
 
-conditionalexpr :: [T.Token] -> (T.Tree, [T.Token])
-conditionalexpr toks = let (conditionaltree, toks') = exprprimary toks
+comparisonexpr :: [T.Token] -> (T.Tree, [T.Token])
+comparisonexpr toks = let (primarytree, toks') = exprprimary toks
                        in
                          case peek toks' of
                            T.TokenComparison op
-                                  -> let (primarytree, toks'') = multdivexpr (toktail toks') 
-                                     in (T.ComparisonNode op primarytree conditionaltree
+                                  -> let (primarytree', toks'') = multdivexpr (toktail toks') 
+                                     in (T.ComparisonNode op primarytree' primarytree
                                         , toks'')
-                           _      -> (conditionaltree, toks')
+                           _      -> (primarytree, toks')
                                      
 exprprimary :: [T.Token] -> (T.Tree, [T.Token])
 exprprimary toks = case peek toks of
-                     T.TokenInt x  -> (T.LiteralNode x, toktail toks)
-                     T.TokenData xs x -> (T.DataNode xs x, toktail toks)
-                     T.TokenBraceL -> let (exprtree, toks'') = expr (toktail toks)
-                                      in (T.GroupingNode T.TokenBraceL exprtree T.TokenBraceR
+                     T.TokenInt x      -> (T.LiteralNode x, toktail toks)
+                     T.TokenData xs x  -> (T.DataNode xs x, toktail toks)
+                     T.TokenBraceL     -> let (exprtree, toks'') = expr (toktail toks)
+                                          in (T.GroupingNode T.TokenBraceL exprtree T.TokenBraceR
                                          , toktail toks'')
-                     T.TokenBlockL  -> let (exprtree, toks'') = expr (toktail toks)
-                                       in (T.BlockNode T.TokenBlockL exprtree T.TokenBlockR
-                                          , toktail toks'')
-                     T.TokenBlockR  -> expr $ toktail toks
+                     T.TokenBraceR     -> let (exprtree, toks'') = expr (toktail toks)
+                                          in (T.GroupingNode T.TokenBraceL exprtree T.TokenBraceR
+                                         , toktail toks'')
                      T.TokenConditional o
-                                   -> let (termTree, toks'') = exprprimary (toktail toks)
-                                      in (T.ConditionalNode o termTree, toks'')
-                     _             -> error "unable to process tokens"
-
+                                       -> let (primarytree, toks'')  = exprprimary (toktail toks)
+                                              (primarytree', toks''')= exprprimary (toks'')
+                                              (primarytree'', _)     = exprprimary (toks''')
+                                          in (T.ConditionalNode o primarytree primarytree'
+                                              primarytree'', toks'')
+                     t                 -> error $ "unable to parse token: " ++ show t
 parse' :: [[T.Token]] -> [T.Tree]
 parse' = \xs -> [parse x | x <- xs]
 

@@ -68,7 +68,7 @@ isprimarykeyword = \xs -> xs `elem` ["begin", "define", "end", "not",
                                      "populate", "updateparents", "max"]
 
 iscomparsionkeyword :: T.Lexeme -> Bool
-iscomparsionkeyword = \xs -> xs `elem` ["gt", "lt", "gteq", "lteq", "noteq", "eq"]
+iscomparsionkeyword = \xs -> xs `elem` ["gt", "lt", "gteq", "lteq", "noteq", "eq", "iseq"]
 
 isdatakeyword :: T.Lexeme -> Bool                              
 isdatakeyword = \xs -> xs `elem` ["adjustment", "factor", "leftchild", "rightchild", 

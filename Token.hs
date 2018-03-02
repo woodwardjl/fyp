@@ -7,7 +7,6 @@ import TypeHelper
 token :: T.Lexeme -> T.Token
 token []                       = T.Null
 token xs
-    | istype       xs          = T.TokenInt $ strtoint xs
     | isconditionalkeyword xs  = T.TokenConditional $ conditional xs
     | iscomparsionkeyword xs   = T.TokenComparison $ comparison xs
     | isdatakeyword xs         = T.TokenData xs (getvar xs)
@@ -16,7 +15,6 @@ token xs
     | iswhitespace xs          = T.Null
     | otherwise                = case xs of
                                    ";"  -> T.TokenTerminator
-                                   ":"  -> T.TokenDefiner
                                    "("  -> T.TokenBraceL
                                    ")"  -> T.TokenBraceR
                                    "{"  -> T.TokenBlockL

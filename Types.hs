@@ -7,11 +7,11 @@ data Tree   = AddSubNode Operator Tree Tree
               | UnaryNode Operator Tree
               | DataNode Lexeme Int
               | LiteralNode Int
-              | ConditionalNode Conditional Tree
+              | ConditionalNode Conditional Tree Tree Tree
               | ComparisonNode Comparison Tree Tree
               | GroupingNode Token Tree Token
-              | DefineNode Token Tree Token
               | BlockNode Token Tree Token
+              | LeafNode
               deriving (Show, Eq)
 
 data Token = TokenOperator Operator
@@ -20,7 +20,6 @@ data Token = TokenOperator Operator
              | TokenInt Int
              | TokenData Lexeme Int
              | TokenTerminator
-             | TokenDefiner
              | TokenBlockL
              | TokenBlockR
              | TokenConditional Conditional
@@ -31,7 +30,7 @@ data Token = TokenOperator Operator
 data Operator = Plus | Minus | Mult | Div
                 deriving Eq
 
-data Comparison = CGT | CLT | CGTEQ | CLTEQ | CEQ | CNOTEQ
+data Comparison = CGT | CLT | CGTEQ | CLTEQ | CEQ | CNOTEQ | CISEQ
                   deriving Eq
 
 data Conditional = If | Else
@@ -48,8 +47,9 @@ instance Show Comparison where
   show (CLT)     = "<"
   show (CGTEQ)   = ">="
   show (CLTEQ)   = "<="
-  show (CEQ)     = "=="
+  show (CEQ)     = "="
   show (CNOTEQ)  = "!="
+  show (CISEQ)   = "=="
 
 instance Show Conditional where
   show If    = "if"
